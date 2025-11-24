@@ -1,0 +1,14 @@
+<div data-id="{{ task.id }}" class="bg-white p-5 rounded-lg shadow hover:shadow-lg transition cursor-move border-l-4 border-indigo-500">
+    <h3 class="font-bold text-lg">{{ task.title }}</h3>
+    {% if task.description %}
+        <p class="text-gray-600 text-sm mt-1">{{ task.description|truncatewords:20 }}</p>
+    {% endif %}
+    {% if task.assignee %}
+        <div class="mt-3 flex items-center gap-2">
+            <span class="text-2xl">Исполнитель:</span>
+            <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+                {{ task.assignee.get_full_name|default:task.assignee.username }}
+            </span>
+        </div>
+    {% endif %}
+</div>

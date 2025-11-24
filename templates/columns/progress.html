@@ -1,0 +1,8 @@
+<h2 class="text-4xl font-bold mb-8 text-orange-700">In Progress — В работе</h2>
+<div class="space-y-6">
+    {% for task in progress %}
+        {% include "partials/task.html" with task=task %}
+    {% empty %}
+        <p class="text-2xl text-gray-500 text-center py-20">Пока ничего не в работе</p>
+    {% endfor %}
+</div>
