@@ -1,28 +1,59 @@
-<!DOCTYPE html>
-<html lang="ru" class="h-full bg-gray-100">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SimpleBoard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-</head>
-<body class="h-full">
-    {% if user.is_authenticated %}
-        <nav class="bg-indigo-600 text-white p-4 shadow-lg">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <h1 class="text-2xl font-bold">SimpleBoard</h1>
-                <div>
-                    <span class="mr-4">Привет, {{ user.get_full_name|default:user.username }}!</span>
-                    <a href="{% url 'logout' %}" class="bg-indigo-700 px-4 py-2 rounded hover:bg-indigo-800">Выйти</a>
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Основная сетка досок -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {% for board in boards %}
+    <div class="bg-white rounded-lg shadow p-4" data-board-id="{{ board.id }}">
+        <!-- Название доски -->
+        <h2 class="text-xl font-bold mb-4">{{ board.name }}</h2>
+
+        <!-- Колонки внутри доски -->
+        <div class="columns space-y-4">
+            {% for column in board.columns.all %}
+            <div class="bg-gray-100 rounded p-2 column" data-column-id="{{ column.id }}">
+                <!-- Название колонки -->
+                <h3 class="font-semibold mb-2">{{ column.name }}</h3>
+
+                <!-- Задачи внутри колонки -->
+                <div class="tasks space-y-2">
+                    {% for task in column.tasks.all %}
+                    <div class="bg-white p-2 rounded shadow task" data-task-id="{{ task.id }}">
+                        {{ task.title }}
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
-        </nav>
-    {% endif %}
-
-    <div class="p-6">
-        {% block content %}{% endblock %}
+            {% endfor %}
+        </div>
     </div>
-</body>
-</html>
+    {% endfor %}
+</div>
+
+<!-- Скрипт для drag-and-drop задач через Sortable.js -->
+<script>
+document.querySelectorAll('.tasks').forEach(container => {
+    new Sortable(container, {
+        group: 'shared', // Все контейнеры с задачами в одной группе для перетаскивания
+        animation: 150,  // Анимация при перемещении
+
+        onEnd: function(evt) {
+            // Получаем id задачи и колонки, куда переместили
+            const taskId = evt.item.dataset.taskId;
+            const columnId = evt.to.closest('.column').dataset.columnId;
+            const boardId = evt.to.closest('[data-board-id]').dataset.boardId;
+
+            // Отправляем PATCH-запрос на сервер для обновления позиции задачи
+            fetch(`/api/tasks/${taskId}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'  // Защита CSRF
+                },
+                body: JSON.stringify({ column: columnId, board: boardId })
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

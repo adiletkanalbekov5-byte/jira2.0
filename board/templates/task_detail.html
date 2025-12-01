@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ task.title }}</title>
+    <!-- Tailwind CSS для стилей -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-8 min-h-screen">
+
+    <!-- Основной контейнер задачи -->
+    <div class="max-w-3xl mx-auto bg-gray-800 rounded-3xl p-8 shadow-2xl">
+        <!-- Заголовок задачи -->
+        <h1 class="text-3xl font-bold text-yellow-300">{{ task.title }}</h1>
+
+        <!-- Описание задачи -->
+        {% if task.description %}
+            <p class="mt-4 text-gray-300">{{ task.description }}</p>
+        {% endif %}
+
+        <!-- Информация о задаче -->
+        <div class="mt-6 space-y-2">
+            <!-- Исполнитель -->
+            {% if task.assignee %}
+                <p>
+                    <span class="font-semibold text-gray-200">Исполнитель:</span>
+                    {{ task.assignee.username }}
+                </p>
+            {% endif %}
+
+            <!-- Дата начала -->
+            {% if task.start_date %}
+                <p>
+                    <span class="font-semibold text-gray-200">Дата начала:</span>
+                    {{ task.start_date }}
+                </p>
+            {% endif %}
+
+            <!-- Дата сдачи -->
+            {% if task.due_date %}
+                <p>
+                    <span class="font-semibold text-gray-200">Дата сдачи:</span>
+                    {{ task.due_date }}
+                </p>
+            {% endif %}
+
+            <!-- Статус задачи -->
+            <p>
+                <span class="font-semibold text-gray-200">Статус:</span>
+                {% if task.status == 'todo' %}
+                    <span class="text-blue-400">To Do</span>
+                {% elif task.status == 'progress' %}
+                    <span class="text-yellow-400">In Progress</span>
+                {% else %}
+                    <span class="text-green-400">Done</span>
+                {% endif %}
+            </p>
+
+            <!-- Приоритет задачи -->
+            <p>
+                <span class="font-semibold text-gray-200">Приоритет:</span>
+                {% if task.priority == 'low' %}
+                    <span class="text-green-400">Низкий</span>
+                {% elif task.priority == 'medium' %}
+                    <span class="text-yellow-400">Средний</span>
+                {% else %}
+                    <span class="text-red-500">Высокий</span>
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Ссылка назад к доске -->
+        <a href="{% url 'board' %}" class="mt-6 inline-block text-blue-400 hover:underline">
+            Назад к доске
+        </a>
+    </div>
+
+</body>
+</html>
