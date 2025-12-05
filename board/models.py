@@ -105,3 +105,10 @@ class Task(models.Model):
         # Сначала сортируем по статусу (todo → progress → done)
         # затем по порядку внутри колонки
         # затем по приоритету (высокий выше)
+
+class Team(models.Model):
+    name = models.CharField(max_length=150)
+    users = models.ManyToManyField(User, related_name="teams")
+
+    def __str__(self):
+        return self.name

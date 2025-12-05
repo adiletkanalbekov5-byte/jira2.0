@@ -13,17 +13,20 @@ from django.template.loader import render_to_string
 # -----------------------------------------------
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
+from django.contrib.auth import get_user_model
 
 # -----------------------------------------------
 # Внутренние импорты
 # -----------------------------------------------
-from .models import Task
-from .serializers import TaskSerializer
+from .models import Team, Task
+from .serializers import UserSerializer, TeamSerializer, TaskSerializer
 
 
 # =====================================================
 #               API (DRF ViewSet)
 # =====================================================
+
+User = get_user_model()
 
 class TaskViewSet(viewsets.ModelViewSet):
     """
@@ -148,3 +151,12 @@ def task_detail(request, id):
     """
     task = get_object_or_404(Task, id=id)
     return render(request, 'task_detail.html', {'task': task})
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class TeamViewSet(viewsets.ModelViewSet):
+    queryset = Team.objects.all()
+    serializer_class = TeamSerializer
